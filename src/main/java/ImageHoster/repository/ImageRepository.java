@@ -35,6 +35,7 @@ public class ImageRepository {
         return newImage;
     }
 
+
     //The method creates an instance of EntityManager
     //Executes JPQL query to fetch all the images from the database
     //Returns the list of all the images fetched from the database

@@ -1,6 +1,8 @@
 package ImageHoster.service;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
+import ImageHoster.repository.CommentRepository;
 import ImageHoster.repository.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,9 @@ public class ImageService {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private CommentRepository commentRepository;
+
     //Call the getAllImages() method in the Repository and obtain a List of all the images in the database
     public List<Image> getAllImages() {
         return imageRepository.getAllImages();
@@ -24,7 +29,6 @@ public class ImageService {
     public void uploadImage(Image image) {
         imageRepository.uploadImage(image);
     }
-
 
     //The method calls the getImageByTitle() method in the Repository and passes the title of the image to be fetched
     public Image getImageByTitle(String title) {

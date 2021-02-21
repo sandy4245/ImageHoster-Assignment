@@ -1,8 +1,10 @@
 package ImageHoster.controller;
 
+import ImageHoster.model.Comment;
 import ImageHoster.model.Image;
 import ImageHoster.model.Tag;
 import ImageHoster.model.User;
+import ImageHoster.service.CommentService;
 import ImageHoster.service.ImageService;
 import ImageHoster.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class ImageController {
     @Autowired
     private TagService tagService;
 
+    @Autowired
+    private CommentService commentService;
+
     //This method displays all the images in the user home page after successful login
     @RequestMapping("images")
     public String getUserImages(Model model) {
@@ -52,6 +57,7 @@ public class ImageController {
         Image image = imageService.getImage(imageId);
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
+        model.addAttribute("comments", image.getComments());
         return "images/image";
     }
 
@@ -87,6 +93,21 @@ public class ImageController {
         return "redirect:/images";
     }
 
+    @RequestMapping(value = "/image/{imageId}/{imageTitle}/comments", method = RequestMethod.POST)
+    public String createComment(@RequestParam("comment") String commentText, @PathVariable("imageId") Integer imageId, HttpSession session) {
+        User user = (User) session.getAttribute("loggeduser");
+        Image image = imageService.getImage(imageId);
+        Comment comment = new Comment();
+        comment.setCreatedDate(new Date());
+        comment.setImage(image);
+        comment.setUser(user);
+        comment.setText(commentText);
+        commentService.uploadComment(comment);
+        return "redirect:/images/" + imageId + "/" + image.getTitle();
+    }
+
+
+
     //This controller method is called when the request pattern is of type 'editImage'
     //This method fetches the image with the corresponding id from the database and adds it to the model with the key as 'image'
     //The method then returns 'images/edit.html' file wherein you fill all the updated details of the image
@@ -101,6 +122,8 @@ public class ImageController {
             String tags = convertTagsToString(image.getTags());
             model.addAttribute("image", image);
             model.addAttribute("tags", tags);
+            List<Comment> comments = image.getComments();
+            model.addAttribute("comments", comments);
             return "images/edit";
         }
         String error = "Only the owner of the image can edit the image";
